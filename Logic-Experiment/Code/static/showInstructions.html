@@ -1,0 +1,238 @@
+<!--
+=====================================================================================================
+II. Present paginated instructions
+=====================================================================================================
+-->
+<!-- This is the drag and drop version of the instructions. -->
+<html>
+<head>
+<title>Instructions</title>
+<link rel="stylesheet" href="./css/jquery-ui.css" type="text/css">
+<link rel="stylesheet" href="./css/nodus-ponens.css" type="text/css" />
+<script src="./js/jquery-1.10.2.js"></script>
+<script src="./js/jquery-ui.js"></script>
+
+<script language="javascript">
+
+var currentPage = 1;                    // Global variable that tracks which page is displayed
+var numPages = 0;
+var currentDiv = 1;
+
+var container0 = document.getElementById("state0");
+if(document.getElementById("state0") != null){  
+    var content = container0.innerHTML;
+}
+
+$(document).ready(function(){
+   numPages = $('.page').length;
+   // Overrides default functionality of jQuery button
+   var handle = $("#slider-handle");
+   $("#slider").slider({value: 0, min: -3, max: 3,
+        create: function() { handle.text($( this ).slider( "value" )); },
+        slide: function(event, ui) { handle.text(ui.value); }
+    }); 
+   $("#nextButton").button().click(function( event ) { event.preventDefault(); });
+   $("#YN-option1").button().click(function( event ) { event.preventDefault(); });
+   $("#YN-option2").button().click(function( event ) { event.preventDefault(); });
+   $("#resetButton").button().click(function( event ) { event.preventDefault(); });
+   $("#div2,#div3,#div4,#div5").hide();
+ });
+
+function nextPage()
+{
+	if (currentPage == (numPages - 1)) $("#nextButton").html("Begin Study");
+	if (currentPage < numPages)
+	{
+		$('#page' + currentPage).hide();
+		$('#page' + (currentPage + 1)).show();
+		currentPage++;
+	}
+	else if (currentPage == numPages) window.location = "showStimuli.html";
+    if (currentPage == 5) { 
+        reset0();
+        $("#taskDemo").show();
+    }
+    if (currentPage == 6) {
+        reset0();
+        $("#taskDemo").show();
+    }
+    if (currentPage == 7) {
+        $("#taskDemo").hide();
+        $("#nextText").hide();
+    }
+}
+
+document.addEventListener('mouseover', function(ev){
+    ev.preventDefault();
+    var currentOption = ev.target.id;
+    if($("#" + currentOption).hasClass("clickable")){
+        var hovResp = document.getElementById(currentOption);
+        hovResp.style.backgroundColor = "#FFFFBF";
+        }
+    }
+);
+
+document.addEventListener('click', function(ev){
+    ev.preventDefault();
+    var currentOption = ev.target.id;
+    if($("#" + currentOption).hasClass("clickable")){
+        $("#blank").append($("#" + currentOption));
+        $("#blank").append(" ");
+        var box = document.getElementById('blank');
+        if (box.innerText.includes("\.") == true) {
+            $("#nextButton").show();
+            if (currentPage == 6) {
+                $("#nextText").show();
+            }
+        }
+    }
+});
+
+document.addEventListener('mouseout', function(ev){
+    ev.preventDefault();
+    var currentOption = ev.target.id;
+    if($("#" + currentOption).hasClass("clickable")){
+        var hovResp = document.getElementById(currentOption);
+        hovResp.style.backgroundColor = "#FFFFFF";
+        }
+    }
+);
+
+function reset0(){
+    var container0 = document.getElementById("state0");
+    currentDiv = 1;
+    container0.innerHTML= html;
+    $("#nextButton,#nextText").hide();
+}                
+var html;
+    window.onload = function(){
+    html = document.getElementById('state0').innerHTML;
+};
+
+</script>
+
+</head>
+
+<body>
+
+<div id="container">
+
+<h1>Instructions</h1>
+
+<div id="page1" class="page" style="display:inline;">
+    <p>In this study, you will read about students at different locations around a university. The students are taking part in a scavenger hunt: they're looking for clues in the rooms they visit.<p>
+		
+	<img src="./img/university.jpeg" />
+		
+	<p>Clues are in the form of objects spread around the campus. Through the course of the study, you'll read about students who are each trying to reconcile some of their thoughts and beliefs with what they may or may not be able to see at a given location.</p>
+	
+       <p>Please click "Next" to continue.</p>
+</div>
+
+<div id="page2" class="page" style="display:none;">
+    <p>For each question, you will be given information about a student, their thoughts and beliefs, and the place they're located.</p>
+	
+	<p>You may learn about scenarios in which students <b><u>are physically separated from the object they are thinking about.</b></u> For instance, if Amy is in room 605, and the ball is in room 102, then Amy does not have access to that ball.</p>
+	
+       <p>Please click "Next" to continue.</p>
+</div>
+
+<div id="page3" class="page" style="display:none;">
+<font color="#BBB">
+	<p>For each question, you will be given information about a student, their thoughts and beliefs, and the place they're located.</p>
+	
+	<p>You may learn about scenarios in which students <b><u>are physically separated from the object they are thinking about.</b></u> For instance, if Amy is in room 605, and the ball is in room 102, then Amy does not have access to that ball.</p>
+	
+</font>
+	
+	<p>It's even possible that <b><u>room 102 is locked and inaccessible</b></u>. That means that nobody else has access to what's inside the room either -- there exist no cameras or other remote tracking capabilities to peer into rooms that are locked and inaccessible.
+	
+    <p>Your task is to figure out what, if anything, you can conclude with certainty from the information you're provided.</p>
+	
+    <p>For an example description, click "Next."</p>
+</div>
+
+<div id="page4" class="page" style="display:none;">
+	
+    <p>For example, here is some information you might learn about a student named Kat:</p>
+	
+    <ul><li>Kat is in room 4A.</li>
+        <li>Kat discovers that if there's a balloon in room 1F, then the key is outside.</li>
+        <li>In fact, there is a balloon in room 1F.</li>
+    </ul>
+    	
+	<p>Please click "Next" to continue.</p>
+</div>
+
+<div id="page5" class="page" style="display:none;">
+<font color="#BBB">
+   <p>For example, here is some information you might learn about a student named Kat:</p>
+
+    <ul><li>Kat is in room 4A.</li>
+        <li>Kat discovers that if there's a balloon in room 1F, then the key is outside.</li>
+        <li>In fact, there is a balloon in room 1F.</li>
+	</ul>
+    </font>
+	
+    <p>Your task is to figure out what, if anything, follows. To respond, you can click the words below to complete a sentence. For example, if you think that "Kat thinks that the key is outside", then click the words "Kat", "thinks that", and "the key is outside" to create a complete sentence in the space below:</p>
+<br />
+</div>
+
+<div id="page6" class="page" style="display:none;">
+<font color="#BBB">
+    <ul><li>Kat is in room 4A.</li>
+        <li>Kat discovers that if there's a balloon in room 1F, then the key is outside.</li>
+        <li>In fact, there is a balloon in room 1F.</li>
+    </ul>
+</font>
+
+<p>You can use any combination of the choices in the word list to make a grammatical sentence. For instance, if you think that nothing follows from the information above, just click "Nothing follows." Alternatively, if you think that "the key is outside", regardless of Kat's thoughts or beliefs about what's on the chalkboard, you can click "the key is outside". Try it out below.</p>
+<br />
+</div>
+
+<div id="page7" class="page" style="display:none;">
+    <p>We are interested in your intuitive, natural responses. This is not a test of your intelligence. Instead, we're curious about how you go about reasoning about the problems. Please take as much time as you need to provide a complete answer for each problem. You will read <strong>18</strong> different descriptions.</p>
+
+   <p>When you are ready to begin the main task, click "Begin Study."</p>
+</div>
+
+<div id="taskDemo" style="display:none;">
+    <div class="flex-container" id="state0" style="display:flex;">
+            <div class="flex-child" id="flexChild1" style="flex: 0 0 auto;margin:auto;padding-right:10px;">
+                <div class="flex-container-2" id="wordBox" style="display:flex;flex-direction:column;align-items:flex-start;justify-content:space-between;height:250px;">
+                    <span id="FITB-1" class="clickable">KAT</span>
+                    <span id="FITB-2" class="clickable">JULIE</span>
+                    <span id="FITB-3" class="clickable">THINKS THAT</span>
+                    <span id="FITB-4" class="clickable">THERE'S A BALLOON</span>
+                    <span id="FITB-5" class="clickable">DISCOVERS THAT</span>
+                    <span id="FITB-6" class="clickable">THE KEY IS OUTSIDE.</span>
+                    <span id="FITB-7" class="clickable">IN ROOM 1F.</span>
+                    <span id="FITB-8" class="clickable">NOTHING FOLLOWS.</span>
+                </div>
+            </div>
+            <div class="flex-child" id="flexChild2" style="flex: 4 0 auto;margin: auto;">
+                <div id="blank" style="min-width:300px;height:30px;border-style:solid;border-width:0px;border-bottom-width:2px"></div>
+            </div>
+        </div>
+        <br /><br />
+        <div>
+            <center><button id="resetButton" value="Reset" onclick="reset0();">Reset</button></center>
+        </div>
+
+<br />
+</div>
+
+<div id="nextText" style="display:none;">
+<p>Excellent job. Throughout the study, you can use this same procedure to come up with a sentence that reflects your thoughts. To complete the task properly, <u>you must create a sentence that makes sense.</u></p>
+
+<p>If you would like to practice the task again, please click "Reset" to create another sentence. Otherwise, click "Next" to continue.</p>
+</div>
+<center><button id="nextButton" value="Next" onclick="nextPage();">Next</button></center>
+<br>
+<br>
+<br>
+
+</div>
+
+</body>
+</html>

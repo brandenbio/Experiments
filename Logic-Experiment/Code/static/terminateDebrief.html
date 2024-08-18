@@ -1,0 +1,43 @@
+<!--
+=====================================================================================================
+IV. Debrief participant and trigger script to end experiment session
+=====================================================================================================
+-->
+
+<html>
+<head>
+<title>Study Debriefing</title>
+<link rel="stylesheet" href="./css/nodus-ponens.css" type="text/css" />
+<script src="./js/jquery-1.10.2.js"></script>
+<script src="./js/jquery-ui.js"></script>
+<script type="text/javascript">
+   $(document).ready(function(){ $.ajax({url: "./endExperiment"}); });  // End experiment, destroy session
+</script>
+</head>
+<body>
+<div id="container">
+   <div id="debriefText">
+   	<h1>Debriefing</h1>
+	
+   	<p>Thanks for completing our study!</p>
+
+    <p>Our study was designed to examine how people understand words such as "know" and "believe" when they're used in everyday language. 
+	People often use those words to describe what's inside other people's heads: "John knows that it's raining" says something about some 
+	piece of information that John is aware of. Philosophers are interested in words such as "know" and "believe" because they might provide clues about
+	the real world. After all, the sentence, "John knows that it's raining" suggests that it is, indeed, raining. </p>
+
+    <p>Our goal in this study was to understand how people process words such as "know" and "believe", and whether that affects the assumptions
+	and inferences they make about the real world. To date, language scientists do not have a theory about how these words are processed -- 
+	even though they're used frequently in daily speech! We hope to fill in that gap. </p>
+
+ 	<p>Your data are anonymous; they will be kept on a secure server and archived.</p>
+
+	<p>Thank you once again for your involvement in our study. You will be credited within the next 72 hours.  Please enter the phrase <b>SAPPY SEAGULLS</b> into Amazon Mechanical Turk to confirm your participation.</p>
+		
+      <p>If you have any questions, feel free to email <b>Danielle Paterno</b>, at
+         <b><a href="mailto:danielle.paterno@gmail.com" target="_blank"><b>danielle.paterno@gmail.com</b></a></b>.</p>
+	</div>
+</div>
+</body>
+
+</html>

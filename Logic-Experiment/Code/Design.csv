@@ -1,0 +1,19 @@
+ProblemNumber,Cond,ProblemType,Construction,EvidenceAccess,Conditional,Categorical,FreeResp
+1,BF_MP_Ev,Believes-Fact,Modus Ponens,Evidence,X thinks that if P then Q,P,NA
+2,KF_MP_Ev,Knows-Fact,Modus Ponens,Evidence,X understands that if P then Q,P,NA
+3,BF_MP_NoEv,Believes-Fact,Modus Ponens,noEvidence,X thinks that if P then Q,P,NA
+4,KF_MP_NoEv,Knows-Fact,Modus Ponens,noEvidence,X understands that if P then Q,P,NA
+5,BF_MP_Ev,Believes-Fact,Modus Ponens,Evidence,X thinks that if P then Q,P,NA
+6,KF_MP_Ev,Knows-Fact,Modus Ponens,Evidence,X understands that if P then Q,P,NA
+7,BF_MP_NoEv,Believes-Fact,Modus Ponens,noEvidence,X thinks that if P then Q,P,NA
+8,KF_MP_NoEv,Knows-Fact,Modus Ponens,noEvidence,X understands that if P then Q,P,NA
+9,BF_MT_Ev,Believes-Fact,Modus Tollens,Evidence,X thinks that if P then Q,not Q,NA
+10,KF_MT_Ev,Knows-Fact,Modus Tollens,Evidence,X understands that if P then Q,not Q,NA
+11,BF_MT_NoEv,Believes-Fact,Modus Tollens,noEvidence,X thinks that if P then Q,not Q,NA
+12,KF_MT_NoEv,Knows-Fact,Modus Tollens,noEvidence,X understands that if P then Q,not Q,NA
+13,BF_MT_Ev,Believes-Fact,Modus Tollens,Evidence,X thinks that if P then Q,not Q,NA
+14,KF_MT_Ev,Knows-Fact,Modus Tollens,Evidence,X understands that if P then Q,not Q,NA
+15,BF_MT_NoEv,Believes-Fact,Modus Tollens,noEvidence,X thinks that if P then Q,not Q,NA
+16,KF_MT_NoEv,Knows-Fact,Modus Tollens,noEvidence,X understands that if P then Q,not Q,NA
+17,AC,Believes-Fact,Modus Tollens,Evidence,X thinks that if P then Q,not Q,NA
+18,AC,Knows-Fact,Modus Ponens,noEvidence,X understands that if P then Q,P,NA

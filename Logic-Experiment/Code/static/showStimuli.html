@@ -1,0 +1,517 @@
+<!--
+=====================================================================================================
+III. Experiment dynamics
+=====================================================================================================
+-->
+
+<html>
+<head>
+<title>Study</title>
+
+<link rel="stylesheet" href="./css/jquery-ui.css" type="text/css" />
+<link rel="stylesheet" href="./css/nodus-ponens.css" type="text/css" />
+<script src="./js/jquery-1.10.2.js"></script>
+<script src="./js/jquery-ui.js"></script>
+<script src="./js/nodusponens-jQ-API.js"></script>
+
+<script language="javascript">
+
+var latencyMinimum   = 3.0;                // Min time (in seconds) Ps need to take when responding
+var fadeTime         = 0.5;         // Amount of time (in ms) it takes to "fade in" any of the divs
+var delayProblemInfo = 1.0;                  // Amount of time (in ms) until stimulus info is shown
+var delayTask        = 3.0;      // Amount of time (in ms, after stimulus info) until task is shown
+var prop;
+// Task options: YN-task, 2AFC-task, 3AFC-task, 4AFC-task, slider-task, radio-task, checkbox-task,
+// rank-task, freeresponse-task, sentencecompletion-task, fillintheblank-task
+
+var task;
+
+function setTask(data)
+{
+    if (data.ProblemType == "Debrief") {
+        // Debrief questions at the end of task
+        task = "freeresponse-task";
+    }
+    else {
+        // Task being completed
+        task = "click-fillintheblank-task";
+    }
+}
+// Handy API functions (from nodusponens-jQ-API.js)...
+//
+// ...reset the task:
+//                      resetTask(task): resets all tasks to blank them out
+//
+// ...to setup the task:
+//                setAFC(option, value): sets values of options for YN-task, 2AFC-task, and 3AFC-task
+//                     setSlider(value): sets value of slider (slider-task)
+//              setRadio(option, value): sets value of radio option
+//              setCheck(option, value): sets value of check option
+//               setFreeResponse(value): sets value of free response textarea
+//         setSentenceCompletion(value): sets value of sentence completion textbox
+//
+// ...to display information:
+//             showProblemInfo(seconds): displays the problem info after a delay of n seconds
+//                    showTask(seconds): displays the task after a delay of n seconds
+
+function displayProblem(data)       // data holds any JSON stimulus object sent back from the server
+{
+   resetTask(task);
+   var options = randomize(["Yes, it's true", "No, it's false", "Can't be certain"]);
+   setAFC('#3AFC-option1', options[0]);
+   setAFC('#3AFC-option2', options[1]);
+   setAFC('#3AFC-option3', options[2]);
+   if (task == "click-fillintheblank-task") {
+       $('#freeresponse-div').hide();
+       prem1Temp = data.Premise1Content;
+       prem2Temp = data.Premise2Content;
+       //supTemp = data.SuppositionContent;
+       room1 = data.LocR;
+       room2 = data.EvidenceContent;
+       ev = data.EvidenceAccess;
+       $('#contextStatement').html(data.IndividX + " is in the " + room1 + ".");
+       //$('#supposition').html("The chalkboard is in " + supTemp + ".");
+       //$('#intermezzo').html(prem1Temp.charAt(0).toUpperCase() + prem1Temp.slice(1) + ".");
+       $('#supposition').html(prem1Temp.charAt(0).toUpperCase() + prem1Temp.slice(1) + ".");
+       $('#premise').html(prem2Temp.charAt(0).toUpperCase() + prem2Temp.slice(1) + ".");
+       if (ev == "Evidence") {
+          $('#intermezzo').html("The " + room2 + " is open and accessible.");
+       } else if (ev == "noEvidence") {
+          $('#intermezzo').html("The " + room2 + " is locked and inaccessible.");
+       }
+       $('#conclusion').html("In " + data.ConclusionPreamble + ", " + data.ConclusionContent + ".");
+       showProblemInfo(delayProblemInfo);
+       showTask(delayProblemInfo+delayTask);
+       pTemp = (data.PropP);
+       //qTemp = ("the letter " + data.PropQ);
+       qTemp = (data.PropQ + ".");
+       wlOp1 = data.IndividX.toUpperCase();
+       wlOp2 = "BELIEVES THAT";
+       wlOp3 = "KNOWS THAT";
+       wlOp4 = ("IN THE " + room2.toUpperCase() + ".");
+       wlOp5 = "IS NOT";
+       wlOp6 = pTemp.toUpperCase();
+       wlOp7 = qTemp.toUpperCase();
+       wlOp8 = "IS";
+       wlOp9 = "THE PASSWORD"
+       wlOp10 = "NOTHING FOLLOWS.";
+    }
+   var wordListOptions = randomize([wlOp1, wlOp2, wlOp3, wlOp4, wlOp5, wlOp6, wlOp7, wlOp8, wlOp9]);
+   setFillInTheBlank('#FITB-1', wordListOptions[0]);
+   setFillInTheBlank('#FITB-2', wordListOptions[1]);
+   setFillInTheBlank('#FITB-3', wordListOptions[2]);
+   setFillInTheBlank('#FITB-4', wordListOptions[3]);
+   setFillInTheBlank('#FITB-5', wordListOptions[4]);
+   setFillInTheBlank('#FITB-6', wordListOptions[5]);
+   setFillInTheBlank('#FITB-7', wordListOptions[6]);
+   setFillInTheBlank('#FITB-8', wordListOptions[7]);
+   setFillInTheBlank('#FITB-9', wordListOptions[8]);
+   setFillInTheBlank('#FITB-10', wlOp10);
+   origState = document.getElementById('state0').innerHTML;
+   /*if (data.Cond == "AC") {
+        $('#afterstatement').html("For this trial, please create the following ungrammatical sentence: \"BELIEVES THAT KNOWS THAT NOTHING FOLLOWS.\"");
+   }
+   else {
+        $('#afterstatement').html("Please answer by clicking words from the word list below to create your response.");
+   }*/
+      if (data.Cond == "AC") {
+        $('#setup').html("For this trial, please ignore the question below and create the following ungrammatical sentence: \"BELIEVES THAT KNOWS THAT NOTHING FOLLOWS.\"");
+   }
+   else {
+        $('#setup').html("Consider the following:");
+   }
+   if (task == "freeresponse-task") {
+        $('#freeresponse-prompt').html(data.FreeResp);
+        $('#problem-info').hide();
+        $('#fixation-cross').hide();
+        $('#click-fillintheblank-task').hide();
+        $('#freeresponse-div').show();
+        $('#freeresponse-task').show();
+   }
+}
+
+function hideProblem()
+{
+    $('#problem-info').hide();                              // Hide problem and show loading text
+    $('#' + task).hide();                                                            // Hide task
+	$('#fixation-cross').html("<center><p style='color: #999'>" + 
+                              "<b>(loading...)</b>" + 
+                              "</p></center>");                        // Set fixation cross text
+    $('#fixation-cross').show();                                          // Show loading message
+}
+
+/* ===== New code specifically for fill in the blank task ===== */
+var origState;
+var theBlank;
+var freshWordList;
+var currentDiv = 1;
+$(document).ready(function(){
+    $("#resetButton").button().click(function( event ) { event.preventDefault(); });
+    $("#cFITBbutton").hide();
+    freshWordList = document.getElementById('flexChild1').innerHTML;
+    theBlank = document.getElementById('flexChild2').innerHTML;
+})
+
+document.addEventListener('mouseover', function(ev){
+    ev.preventDefault();
+    var currentOption = ev.target.id;
+    if($("#" + currentOption).hasClass("clickable")){
+        var hovResp = document.getElementById(currentOption);
+        hovResp.style.backgroundColor = "#FFFFBF";
+        }
+    }
+);
+
+document.addEventListener('click', function(ev){
+    ev.preventDefault();
+    var currentOption = ev.target.id;
+    if($("#" + currentOption).hasClass("clickable")){
+        $("#blank").append($("#" + currentOption));
+        $("#blank").append(" ");
+        var box = document.getElementById('blank');
+        if (box.innerText.includes("\.") == true) {
+            $("#cFITBbutton").show();
+        }
+    }
+});
+
+document.addEventListener('mouseout', function(ev){
+    ev.preventDefault();
+    var currentOption = ev.target.id;
+    if($("#" + currentOption).hasClass("clickable")){
+        var hovResp = document.getElementById(currentOption);
+        hovResp.style.backgroundColor = "#FFFFFF";
+        }
+    }
+);
+
+function reset0(){
+    currentDiv = 1;
+    $("#cFITBbutton").hide();
+    state0.innerHTML = origState;
+}
+function clearTrial(){
+    currentDiv = 1;
+    $("#cFITBbutton").hide();
+    flexChild1.innerHTML = freshWordList;
+    flexChild2.innerHTML = theBlank;
+}         
+/* ============================================================ */
+
+</script>
+
+</head>
+
+<body>
+<div id="container">
+   
+   <!--
+         Problem information page
+         ========================
+         This page displays the text pertaining to the reasoning problem, including
+         suppositional premises (e.g., "Suppose that...", "Consider that...") as well
+         as premises and a relevant inferential task.
+   -->
+   <div id="problem-info" class="page" style="display:inline;">
+	    <p id="setup">Consider the following:</p>
+		<ul><li><div id="contextStatement">Agent is in a room on floor 1.</div></li>
+            <li><div id="intermezzo">The location is accessible.</div></li>
+            <li><div id="supposition">Agent believes/knows that if P then Q.</div></li>
+	        <li><div id="premise">The ink color is not Q.</div></li>
+		</ul>
+        
+        <p id="question">What, if anything, follows?</p>
+        <p id="afterstatement">Please answer by clicking words from the word list below to create your response.</p>
+        <br>
+   </div>
+
+   <div id="freeresponse-div" class="page" style="display: none;">
+        <p id="freeresponse-prompt">Tell us about your thinking process.</p>
+   </div>
+
+   <!--
+         Fixation cross
+         ==============
+         Controls the display of a fixation cross or a loading message.
+   -->
+   <div id="fixation-cross" class="page" style="display:none;">
+      
+   </div>
+
+   <!--
+       Task page: Yes-No task
+       ======================
+       Provides "yes" or "no" options for participants to choose from.
+   -->
+   <div id="YN-task" style="display:none;">
+      <center>
+         <button id="YN-option1" value="option1" style="width:80px;"
+          onclick="respondAFC('#YN-option1');">Yes</button>
+		  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      	<button id="YN-option2" value="option2" style="width:80px;"
+          onclick="respondAFC('#YN-option2');">No</button><br><br>
+      </center>
+   </div>
+   
+   <!--
+       Task page: 2-alternative forced-choice
+       ======================================
+       Provides two separate options for participants to choose from.
+   -->
+   <div id="2AFC-task" style="display:none;">
+      <center>
+         <button id="2AFC-option1" value="option1" style="width:180px;"
+          onclick="respondAFC('#2AFC-option1');">option-1</button><br><br>
+      	<button id="2AFC-option2" value="option2" style="width:180px;"
+          onclick="respondAFC('#2AFC-option2');">option-2</button><br><br>
+      </center>
+   </div>
+      
+   <!--
+       Task page: 3-alternative forced-choice
+       ======================================
+       Provides three separate options for participants to choose from.
+   -->
+   <div id="3AFC-task" style="display:none;">
+      <center>
+         <button id="3AFC-option1" value="option1" style="width:380px;"
+          onclick="respondAFC('#3AFC-option1');">option-1</button><br><br>
+      	<button id="3AFC-option2" value="option2" style="width:380px;"
+          onclick="respondAFC('#3AFC-option2');">option-2</button><br><br>
+      	<button id="3AFC-option3" value="option3" style="width:380px;"
+          onclick="respondAFC('#3AFC-option3');">option-3</button>
+      </center>
+   </div>
+
+   <!--
+       Task page: 4-alternative forced-choice
+       ======================================
+       Provides three separate options for participants to choose from.
+   -->
+   <div id="4AFC-task" style="display:none;">
+      <center>
+         <button id="4AFC-option1" value="option1" style="width:380px;"
+          onclick="respondAFC('#4AFC-option1');">option-1</button><br><br>
+      	<button id="4AFC-option2" value="option2" style="width:380px;"
+          onclick="respondAFC('#4AFC-option2');">option-2</button><br><br>
+      	<button id="4AFC-option3" value="option3" style="width:380px;"
+          onclick="respondAFC('#4AFC-option3');">option-3</button><br><br>
+        <button id="4AFC-option4" value="option4" style="width:380px;"
+          onclick="respondAFC('#4AFC-option4');">option-4</button>  
+      </center>
+   </div>
+   
+   <!--
+       Task page: Slider task
+       ======================
+       Provides a slider that participants can use to slide between values to make,
+       e.g., probability estimates that range from 0-100% (default).
+   -->
+    <div id="slider-task" style="display:none;"  >
+      <center>
+       <div id="slider">
+          <div id="slider-handle" class="ui-slider-handle"></div>
+       </div>
+      </center><br>
+	   <div id = "container">Note:
+        <p style="margin-left: 40px"> -3 = The statement is definitely false</p> 
+        <p style="margin-left: 40px"> 0 = I cannot be certain</p>
+        <p style="margin-left: 40px"> 3 = The statement is definitely true</p>
+    	<center><button id="slider-respond-button" value="slider-respond-button" style="width:180px;"
+        onclick="respondSlider('#slider');">Next</button></center>
+    </div>
+   </div>
+   
+   <!--
+       Task page: Radio choice task
+       ============================
+       Provides a set of radio buttons (three by default), i.e., single-selection
+       options for participants to choose from. This task can be modified (buttons can
+       be added arbitrary) to implement Likert scales.
+   -->
+   <div id="radio-task" style="display:none;" >
+         <div>
+             <input id="radio-1" class="radio-custom" name="radio-task-buttons" type="radio">
+             <label for="radio-1" class="radio-custom-label">radio-value-1</label>
+         </div>
+         <div>
+             <input id="radio-2" class="radio-custom" name="radio-task-buttons" type="radio">
+             <label for="radio-2" class="radio-custom-label">radio-value-2</label>
+         </div>
+         <div>
+             <input id="radio-3" class="radio-custom" name="radio-task-buttons" type="radio">
+             <label for="radio-3" class="radio-custom-label">radio-value-3</label>
+         </div>
+		 <br><br>
+         <center>
+    	 <button id="radio-respond-button" value="radio-respond-button" style="width:180px;"
+        onclick="respondRadio();">Next</button>
+         </center>
+   </div>
+   
+   <!--
+       Task page: Ranking task
+       =======================
+       Provides a set of options (three by default) for participants to rank in a given order.
+	   This task can be modified (buttons can be added arbitrary).
+   -->
+   <div id="rank-task" style="display:none;" >
+	   <ul id="sortable">
+	     <li class="ui-state-default"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span>rank-option-1</li>
+	     <li class="ui-state-default"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span>rank-option-1</li>
+	     <li class="ui-state-default"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span>rank-option-3</li>
+	   </ul>
+
+         <center>
+    	 <button id="rank-respond-button" value="rank-respond-button" style="width:180px;"
+        onclick="respondRank();">Next</button>
+      </center>
+   </div>
+
+   <!--
+       Task page: Checkbox choice task
+       ===============================
+       Provides a set of checkbox buttons (three by default), i.e., single-selection
+       options for participants to choose from. This task can be modified (buttons can
+       be added arbitrary) to implemented Likert scales.
+   -->
+   <div id="checkbox-task" style="display:none;" >
+       <div>
+         <input id="checkbox-1" class="checkbox-custom" name="checkbox-task-buttons" type="checkbox">
+		 <label for="checkbox-1" class="checkbox-custom-label">checkbox-value-1</label>
+       </div>
+       <div>
+         <input id="checkbox-2" class="checkbox-custom" name="checkbox-task-buttons" type="checkbox">
+		 <label for="checkbox-2" class="checkbox-custom-label">checkbox-value-2</label>
+       </div>
+       <div>
+         <input id="checkbox-3" class="checkbox-custom" name="checkbox-task-buttons" type="checkbox">
+		 <label for="checkbox-3" class="checkbox-custom-label">checkbox-value-3</label>
+       </div>
+	   <div>
+         <input id="checkbox-4" class="checkbox-custom" name="checkbox-task-buttons" type="checkbox">
+		 <label for="checkbox-4" class="checkbox-custom-label">checkbox-value-4</label>
+       </div>
+       <div>
+         <input id="checkbox-5" class="checkbox-custom" name="checkbox-task-buttons" type="checkbox">
+		 <label for="checkbox-5" class="checkbox-custom-label">checkbox-value-5</label>
+       </div>
+	   <br><br>
+         <center>
+    	 <button id="checkbox-respond-button" value="checkbox-respond-button" style="width:180px;"
+        onclick="respondCheck();">Next</button>
+      </center>
+   </div>
+   
+   <!--
+       Task page: Free response task
+       =============================
+       Provides a box for participants to type out information freely, i.e., no
+       restrictions in the amount they need to type.
+   -->
+   <div id="freeresponse-task" style="display:none;" >
+       <div><textarea id="freeresponse"></textarea>
+       </div><br><br>
+         <center>
+    	 <button id="freeresponse-respond-button" value="freeresponse-respond-button" style="width:180px;"
+        onclick="respondFreeResponse();">Next</button>
+      </center>
+   </div>
+   
+   <!--
+       Task page: Sentence completion (fill-in-the-blank) task
+       =======================================================
+       Provides a sentence and a box for participants to type out a response that completes the
+       sentence.
+   -->
+   <div id="sentencecompletion-task" style="display:none;" >
+       <div>
+          <label id="sentence-to-complete-1" for="completion" style="text-align: right; clear: both; float:left; margin-right:10px; display: inline-block;">Why is it that </label>
+          <input type="text" id="completion" name="completion" value="" style="font-weight:bold;width:350px;height:25px;display: inline-block;"/>
+          <label id="sentence-to-complete-2" for="completion" style="text-align:left; display: inline-block;">?</label>
+       </div><br><br>
+         <center>
+    	  <button id="sentencecompletion-respond-button" value="sentencecompletion-respond-button" style="width:180px;"
+        onclick="respondSentenceCompletion();">Next</button>
+      </center>
+   </div>
+
+   <!--
+        Task page: Fill in the blank task (Free choice sentence construction)
+        =====================================================================
+        Provides a word list to select from in which words can be dragged to 
+        a blank line for subjects to construct a response.
+   -->
+
+<!--    <div id="drag-fillintheblank-task" style="display:none;">
+       <div class="flex-container" id="state0" style="display:flex;">
+            <div class="flex-child" id="flexChild1" style="flex: 1 1 auto;margin: auto;">
+                <div class="flex-container-2" id="wordBox" style="display:flex;flex-direction: column;align-items: flex-start;justify-content: space-between;height:200px;">
+                    <span id="FITB-option1" draggable="true" ondragstart="drag(event)" style="flex: 1 1 0;border-style:solid;border-width:1px;padding:3px;min-height:20px;max-height:20px;">Name-1</span>
+                    <span id="FITB-option2" draggable="true" ondragstart="drag(event)" style="flex: 1 1 0;border-style:solid;border-width:1px;padding:3px;min-height:20px;max-height:20px;">Name-2</span>
+                    <span id="FITB-option3" draggable="true" ondragstart="drag(event)" style="flex: 1 1 0;border-style:solid;border-width:1px;padding:3px;min-height:20px;max-height:20px;">believes that</span>
+                    <span id="FITB-option4" draggable="true" ondragstart="drag(event)" style="flex: 1 1 0;border-style:solid;border-width:1px;padding:3px;min-height:20px;max-height:20px;">knows that</span>
+                    <span id="FITB-option5" draggable="true" ondragstart="drag(event)" style="flex: 1 1 0;border-style:solid;border-width:1px;padding:3px;min-height:20px;max-height:20px;">Proposition</span>
+                    <span id="FITB-option6" draggable="true" ondragstart="drag(event)" style="flex: 1 1 0;border-style:solid;border-width:1px;padding:3px;min-height:20px;max-height:20px;">Proposition</span>
+                </div>
+            </div>
+            <div class="flex-child" id="flexChild2" style="flex: 3 1 auto;margin: auto;">
+                <div id="blank1" ondrop="drop(event)" ondragover="allowDrop(event)" style="width:300px;height:30px;border-style:solid;border-width:0px;border-bottom-width:2px"></div>
+                <div id="blank2" ondrop="drop(event)" ondragover="allowDrop(event)" style="display:inline-block;width:300px;height:30px;border-style:solid;border-width:0px;border-bottom-width:2px"></div>
+                <div id="blank3" ondrop="drop(event)" ondragover="allowDrop(event)" style="display:inline-block;width:300px;height:30px;border-style:solid;border-width:0px;border-bottom-width:2px"></div>
+                <div id="blank4" ondrop="drop(event)" ondragover="allowDrop(event)" style="display:inline-block;width:300px;height:30px;border-style:solid;border-width:0px;border-bottom-width:2px"></div>
+                <div id="blank5" ondrop="drop(event)" ondragover="allowDrop(event)" style="display:inline-block;width:300px;height:30px;border-style:solid;border-width:0px;border-bottom-width:2px"></div>
+                <div id="blank6" ondrop="drop(event)" ondragover="allowDrop(event)" style="display:inline-block;width:300px;height:30px;border-style:solid;border-width:0px;border-bottom-width:2px"></div>
+            </div>
+        </div>
+        <br /><br />
+        <div style="margin-left: -350px;">
+            <center><button id="resetButton" value="Reset" onclick="reset0();">Reset</button></center>
+            <br /><br />
+            <center><button id="FITBbutton" value="FITBbutton" onclick="respondFillInTheBlank();">Next</button></center>
+        </div>
+    </div> -->
+
+    <!--
+        Task page: Clickable fill in the blank task (free choice sentence construction)
+        =====================================================================
+        Provides a word list to select from in which words can be clicked on to 
+        to construct a response.
+   -->
+
+   <div id="click-fillintheblank-task" style="display:none;">
+       <div class="flex-container" id="state0" style="display:flex;">
+            <div class="flex-child" id="flexChild1" style="flex: 0 0 auto;margin:auto;padding-right:10px;">
+                <div class="flex-container-2" id="wordBox" style="display:flex;flex-direction:column;align-items:flex-start;justify-content:space-between;height:300px;">
+                    <span id="FITB-1" class="clickable">Option1</span>
+                    <span id="FITB-2" class="clickable">Option2</span>
+                    <span id="FITB-3" class="clickable">Option3</span>
+                    <span id="FITB-4" class="clickable">Option4</span>
+                    <span id="FITB-5" class="clickable">Option5</span>
+                    <span id="FITB-6" class="clickable">Option6</span>
+                    <span id="FITB-7" class="clickable">Option7</span>
+                    <span id="FITB-8" class="clickable">Option8</span>
+                    <span id="FITB-9" class="clickable">Option9</span>
+                    <span id="FITB-10" class="clickable">Option10</span>
+                </div>
+            </div>
+            <div class="flex-child" id="flexChild2" style="flex: 4 0 auto;margin: auto;">
+                <div id="blank" style="min-width:300px;height:30px;border-style:solid;border-width:0px;border-bottom-width:2px"></div>
+            </div>
+        </div>
+        <br /><br />
+        <div>
+            <center><button id="resetButton" value="Reset" onclick="reset0();">Reset</button></center>
+            <br /><br />
+            <center><button id="cFITBbutton" value="FITBbutton" onclick="respondFillInTheBlank();">Next</button></center>
+        </div>
+    </div>
+
+</div>
+
+<div id="message" style="display:none;"><p style="font-size:12pt">
+   Please read the question and the response options fully before proceeding.<br></p>
+</div>
+
+</body>
+</html>
